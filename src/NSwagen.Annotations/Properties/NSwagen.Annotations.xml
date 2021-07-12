@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NSwagen.Annotations</name>
+    </assembly>
+    <members>
+        <member name="T:NSwagen.Annotations.GeneratorAttribute">
+            <summary>
+            Specifies the client generators and tags.
+            </summary>
+        </member>
+        <member name="M:NSwagen.Annotations.GeneratorAttribute.#ctor(System.Type,System.String,System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:NSwagen.Annotations.GeneratorAttribute"/> class.
+            </summary>
+            <param name="type">The client generator type.</param>
+            <param name="generatorMethod">The client generator method name.</param>
+            <param name="tags">Tags to identify the client generator.</param>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorAttribute.Type">
+            <summary>
+            Gets the type of client generator.
+            </summary>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorAttribute.Tags">
+            <summary>
+            Gets the tags to identify the client generator.
+            </summary>
+        </member>
+        <member name="T:NSwagen.Annotations.GeneratorPropertyAttribute">
+            <summary>
+             Specifies the property which required to be passed for client generation.
+            </summary>
+        </member>
+        <member name="M:NSwagen.Annotations.GeneratorPropertyAttribute.#ctor(System.String,System.String,System.Boolean,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NSwagen.Annotations.GeneratorPropertyAttribute"/> class.
+            </summary>
+            <param name="description">Description of the generator property.</param>
+            <param name="defaultValue">Default value of the generator property.</param>
+            <param name="required">Is required boolean value.</param>
+            <param name="name">The property name.</param>
+            <param name="dataType">Data type of generator property.</param>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorPropertyAttribute.Description">
+            <summary>
+            Gets the description of the property.
+            </summary>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorPropertyAttribute.DefaultValue">
+            <summary>
+            Gets the default value of the property.
+            </summary>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorPropertyAttribute.Required">
+            <summary>
+            Gets a value indicating whether property is required.
+            </summary>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorPropertyAttribute.Name">
+            <summary>
+            Gets the property name.
+            </summary>
+        </member>
+        <member name="P:NSwagen.Annotations.GeneratorPropertyAttribute.DataType">
+            <summary>
+            Gets the data type of the property.
+            </summary>
+        </member>
+    </members>
+</doc>

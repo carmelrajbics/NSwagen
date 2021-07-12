@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "NSwagen": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "promptArgs": "true",
+        "Key": "Value"
+      }
+    }
+  }
+}
