@@ -14,7 +14,7 @@
 				<!-- Package properties -->
 				<Version>0.1.0</Version>
 				<Authors>Prathima</Authors>
-        <Owners>prathimanm</Owners>
+				<Owners>prathimanm</Owners>
 				<Company>Prathima</Company>
 				<Product>NSwagen</Product>
 				<RepositoryType>Git</RepositoryType>
