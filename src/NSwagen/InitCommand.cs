@@ -11,7 +11,7 @@ using Oakton;
 
 namespace NSwagen.Cli
 {
-    [Description("Lists the generator information.")]
+    [Description("Creates the configuration file with predefined values for a specified package.")]
     public class InitCommand : OaktonAsyncCommand<InitInput>
     {
         public override async Task<bool> Execute(InitInput input)

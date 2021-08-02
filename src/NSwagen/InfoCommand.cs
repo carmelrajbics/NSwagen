@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NSwagen.Cli.Inputs;
 using NSwagen.Core;
@@ -54,9 +55,9 @@ namespace NSwagen.Cli
                 //Display the properties
                 ConsoleWriter.Write(Environment.NewLine);
                 ConsoleWriter.Write(ConsoleColor.Cyan, "Generator Properties");
-                if (generatorInfo.Generator.GeneratorProperties is null)
+                if (generatorInfo.Generator.GeneratorProperties is null || !generatorInfo.Generator.GeneratorProperties.Any())
                 {
-                    ConsoleWriter.Write(ConsoleColor.DarkRed, "No generator properties available.");
+                    ConsoleWriter.Write(ConsoleColor.DarkCyan, "No generator properties available.");
                     return true;
                 }
 
