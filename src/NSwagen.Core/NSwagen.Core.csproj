@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="NSwag.CodeGeneration" Version="13.10.1" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.10.1" />
+    <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="13.10.1" />
     <PackageReference Include="Humanizer.Core" Version="2.11.10" />
   </ItemGroup>
 
