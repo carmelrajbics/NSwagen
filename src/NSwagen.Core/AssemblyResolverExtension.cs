@@ -57,7 +57,7 @@ namespace NSwagen.Core
             Assembly initialAssembly = null!;
             foreach (var assemblyPath in assemblies)
             {
-                if (Path.GetFileName(assemblyPath) == $"{package}.dll")
+                if (Path.GetFileName(assemblyPath).Equals($"{package}.dll", StringComparison.OrdinalIgnoreCase))
                     initialAssembly = Assembly.Load(await File.ReadAllBytesAsync(assemblyPath).ConfigureAwait(false));
                 else
                     _ = Assembly.Load(await File.ReadAllBytesAsync(assemblyPath).ConfigureAwait(false));
