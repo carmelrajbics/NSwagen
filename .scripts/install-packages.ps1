@@ -14,10 +14,11 @@ if (-Not $Version) {
 }
 
 if(-Not $ApiKey) {
-    $ApiKey = "**********************************************"
+    $ApiKey = "********************************************"
 }
 
-$NuGetSource = "https://nuget.pkg.github.com/prathimanm/index.json"
+#$NuGetSource = "https://nuget.pkg.github.com/prathimanm/index.json"
+$NuGetSource = "https://api.nuget.org/v3/index.json"
 
 dotnet build -c Release
 
