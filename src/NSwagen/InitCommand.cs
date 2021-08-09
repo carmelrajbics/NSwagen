@@ -16,21 +16,32 @@ namespace NSwagen.Cli
     {
         public override async Task<bool> Execute(InitInput input)
         {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
+            try
+            {
+                if (input is null)
+                    throw new ArgumentNullException(nameof(input));
 
-            ConsoleWriter.Write(ConsoleColor.DarkCyan, "Processing Init command request....");
+                ConsoleWriter.Write(ConsoleColor.DarkCyan, "Processing Init command request....");
 
-            var result = await ProcessInitRequest(input).ConfigureAwait(false);
-            string outputPath = Helper.ResolveOutputPath(input.OutputFlag, "nswagen.config.json");
-            await File.WriteAllTextAsync(outputPath, result).ConfigureAwait(false);
-            ConsoleWriter.Write(ConsoleColor.DarkGreen, $"File {outputPath} is generated successfully.");
+                var result = await ProcessInitRequest(input).ConfigureAwait(false);
+                string outputPath = Helper.ResolveOutputPath(input.OutputFlag, "nswagen.config.json");
+                await File.WriteAllTextAsync(outputPath, result).ConfigureAwait(false);
+                ConsoleWriter.Write(ConsoleColor.DarkGreen, $"File {outputPath} is generated successfully.");
 
-            return true;
+                return true;
+            }
+            catch (Exception e)
+            {
+                ConsoleWriter.Write(ConsoleColor.Red, e.InnerException is null ? e.Message : e.InnerException.Message);
+            }
+
+            return default;
         }
 
         private static async Task<string> ProcessInitRequest(InitInput input)
         {
+            List<GeneratorConfiguration> configurations = new List<GeneratorConfiguration>();
+
             GeneratorConfiguration configuration = new ()
             {
                 Swagger = "file|url",
@@ -42,6 +53,7 @@ namespace NSwagen.Cli
                     Discover = false,
                 },
             };
+
             if (string.IsNullOrEmpty(input.PackageFlag) && string.IsNullOrEmpty(input.AssemblyFlag))
                 configuration.Generator.Name = "<generator name>";
             else
@@ -61,11 +73,15 @@ namespace NSwagen.Cli
                     generatorProperty => generatorProperty.DefaultValue);
             }
 
-            var json = JsonSerializer.Serialize(configuration, new JsonSerializerOptions()
+            configurations.Add(configuration);
+
+            var json = JsonSerializer.Serialize(configurations, new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+
+                //Converters = { new ConfigurationConverter() },
             });
             return json;
         }

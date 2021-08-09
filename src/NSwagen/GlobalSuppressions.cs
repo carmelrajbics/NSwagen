@@ -8,3 +8,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Usage", "CA2201:Do not raise reserved exception types", Justification = "Need to add custom exception")]
 [assembly: SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown", Justification = "Need to add custom exception")]
 [assembly: SuppressMessage("Major Code Smell", "S4457:Parameter validation in async/await methods should be wrapped", Justification = "Revisit later")]
+[assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching General Exceptions")]

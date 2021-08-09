@@ -19,7 +19,7 @@ namespace NSwagen.Core
 
             //Download nuget package
             FileInfo? packagePath = await client.DownloadLatestPackageAsync(package,
-                Directory.GetCurrentDirectory(),
+                Path.GetTempPath(),
                 overwrite: true).ConfigureAwait(false);
 
             if (packagePath is null)

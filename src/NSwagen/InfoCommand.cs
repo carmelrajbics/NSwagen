@@ -13,14 +13,23 @@ namespace NSwagen.Cli
     {
         public override async Task<bool> Execute(BaseInput input)
         {
-            if (!string.IsNullOrEmpty(input?.PackageFlag) || !string.IsNullOrEmpty(input?.AssemblyFlag))
+            try
             {
-                ConsoleWriter.Write(ConsoleColor.DarkCyan, "Processing Info command request..");
-                return await ProcessInfoRequest(input).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(input?.PackageFlag) || !string.IsNullOrEmpty(input?.AssemblyFlag))
+                {
+                    ConsoleWriter.Write(ConsoleColor.DarkCyan, "Processing Info command request..");
+                    return await ProcessInfoRequest(input).ConfigureAwait(false);
+                }
+
+                ConsoleWriter.Write(ConsoleColor.Red, "Provide either package or assembly details.");
+                return true;
+            }
+            catch (Exception e)
+            {
+                ConsoleWriter.Write(ConsoleColor.Red, e.InnerException is null ? e.Message : e.InnerException.Message);
             }
 
-            ConsoleWriter.Write(ConsoleColor.Red, "Provide either package or assembly details.");
-            return true;
+            return default;
         }
 
         private static async Task<bool> ProcessInfoRequest(BaseInput input)
