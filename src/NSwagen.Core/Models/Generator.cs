@@ -13,6 +13,7 @@ namespace NSwagen.Core.Models
 
         public string Name { get; set; } = null!;
 
+        [JsonIgnore]
         public bool Discover { get; set; }
 
         [JsonIgnore]
