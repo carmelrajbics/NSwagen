@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace NSwagen.Cli
 {
@@ -16,9 +15,17 @@ namespace NSwagen.Cli
                 if (Directory.Exists(output))
                     return Path.Combine(output, defaultFileName);
                 else if (Path.HasExtension(output))
+                {
+                    var directoryName = Path.GetDirectoryName(output);
+                    if (!Directory.Exists(directoryName))
+                        Directory.CreateDirectory(directoryName!);
                     return output;
+                }
                 else
-                    throw new Exception($"Please provide the valid output path {output}");
+                {
+                    Directory.CreateDirectory(output);
+                    return Path.Combine(output, defaultFileName);
+                }
             }
         }
     }
