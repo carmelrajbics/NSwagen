@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 using NSwagen.Cli.Inputs;
 using NSwagen.Core;
-using NSwagen.Core.Models;
 using Oakton;
 
 namespace NSwagen.Cli
@@ -43,13 +40,7 @@ namespace NSwagen.Cli
                     throw new Exception("Configuration file not found.");
             }
 
-            var configString = await File.ReadAllTextAsync(input.ConfigurationFileFlag).ConfigureAwait(false);
-
-            var configModels = JsonSerializer.Deserialize<List<GeneratorConfiguration>>(configString,
-                new JsonSerializerOptions()
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
+            var configModels = await ConfigurationHelper.ConfigurationDeserializer(input.ConfigurationFileFlag).ConfigureAwait(false);
 
             if (configModels is { Count: <= 0 })
                 throw new Exception("Error in mapping config file.");

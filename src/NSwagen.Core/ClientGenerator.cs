@@ -100,7 +100,7 @@ namespace NSwagen.Core
             var generatorProperties = Helper.GetGeneratorProperties(assembly);
             var missingRequiredProperties = generatorProperties
                 .Where(generatorProperty => generatorProperty.Required &&
-                                            !_configuration.Generator.Properties.ContainsKey(generatorProperty.Name))
+                                            !_configuration.Generator.Properties!.ContainsKey(generatorProperty.Name))
                 .Select(_ => _.Name).ToList();
 
             if (missingRequiredProperties is { Count: > 0 })
@@ -192,7 +192,8 @@ namespace NSwagen.Core
 #pragma warning disable CS8601 // Possible null reference assignment.
                     constructorParameters[i] = Activator.CreateInstance(parameterInfos[i].ParameterType);
 #pragma warning restore CS8601 // Possible null reference assignment.
-                    RecursivePropertyMapping(constructorParameters[i], _configuration.Generator.Properties);
+                    if (_configuration.Generator.Properties is { Count: > 0 })
+                        RecursivePropertyMapping(constructorParameters[i], _configuration.Generator.Properties);
                 }
             }
 
