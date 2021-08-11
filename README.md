@@ -35,6 +35,6 @@ nswagen create [option]
 nswagen generate [option]
 ```
 ## Documentation
-NSwagen documentation can be found in the [wiki]()
+NSwagen documentation can be found in the [wiki](https://github.com/prathimanm/NSwagen/wiki/NSwagen-documentation)
 
 
