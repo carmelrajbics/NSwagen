@@ -12,18 +12,8 @@ namespace NSwagen.Core
     {
         internal static async Task<(Assembly, string?, string?)> ExtractNugetPackage(this string package, string? source)
         {
-            //Read, download and extract nuget package from the source specified.
-            source = string.IsNullOrEmpty(source) ? "https://api.nuget.org/v3/index.json" : source;
-
-            using NuGetClient client = new (source);
-
-            //Download nuget package
-            FileInfo? packagePath = await client.DownloadLatestPackageAsync(package,
-                Path.GetTempPath(),
-                overwrite: true).ConfigureAwait(false);
-
-            if (packagePath is null)
-                throw new Exception($"Could not find the package {package} in the source {source}");
+            var packagePath = await DownloadLatestPackage(package,
+                string.IsNullOrEmpty(source) ? "https://api.nuget.org/v3/index.json" : source).ConfigureAwait(false);
 
             //Extract nuget package
             var packageExtractPath = Path.ChangeExtension(packagePath.FullName, null);
@@ -40,6 +30,28 @@ namespace NSwagen.Core
             var initialAssembly = await LoadAssemblies(packageExtractPath, package).ConfigureAwait(false);
 
             return (initialAssembly, packageZipPath, packageExtractPath);
+        }
+
+        private static async Task<FileInfo> DownloadLatestPackage(string package, string source)
+        {
+            try
+            {
+                //Read, download and extract nuget package from the source specified.
+                using NuGetClient client = new (source);
+
+                //Download nuget package
+                FileInfo? packagePath = await client.DownloadLatestPackageAsync(package,
+                    Path.GetTempPath(),
+                    overwrite: true).ConfigureAwait(false);
+
+                if (packagePath is null)
+                    throw new Exception($"Could not find the package {package} in the source {source}");
+                return packagePath;
+            }
+            catch (Exception)
+            {
+                throw new Exception($"Error in  loading the package {package} from the source {source}");
+            }
         }
 
         private static async Task<Assembly> LoadAssemblies(string folderName, string package)

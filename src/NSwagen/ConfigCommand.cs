@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ConsoleFx.Prompter;
+using Microsoft.CSharp.RuntimeBinder;
 using NSwagen.Cli.Inputs;
 using NSwagen.Core;
 using NSwagen.Core.Models;
 using Oakton;
+
+using CFxPrompter = ConsoleFx.Prompter.Prompter;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace NSwagen.Cli
 {
@@ -25,6 +31,8 @@ namespace NSwagen.Cli
             {
                 if (input is null)
                     throw new ArgumentNullException(nameof(input));
+
+                ConfigurationPrompter(input);
 
                 ConsoleWriter.Write(ConsoleColor.DarkCyan, $"Processing {input.Action} command request....");
                 string outputPath = Helper.ResolveOutputPath(input.OutputFlag, "nswagen.config.json");
@@ -57,6 +65,78 @@ namespace NSwagen.Cli
             }
 
             return default;
+        }
+
+        private static void ConfigurationPrompter(ConfigInput input)
+        {
+            CFxPrompter.Style = Styling.Terminal;
+            var prompter = new CFxPrompter();
+
+            prompter.Confirm("DefaultConfiguration", "Do you want create a configuration with default values? ", true);
+
+            prompter.Input(nameof(input.SwaggerFlag), $"Please provide the swagger file|url path: ", q => q
+                .When(ans => string.IsNullOrEmpty(input.SwaggerFlag) && !ans.DefaultConfiguration)
+                .WithInstructions("Format should be valid file|url path.")
+                .ValidateInputWith((swagger, _) =>
+                    swagger.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                    swagger.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+                    swagger.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+                    swagger.EndsWith(".yml", StringComparison.OrdinalIgnoreCase) ||
+                    swagger.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                .DefaultsTo("file|url"));
+
+            prompter.Input(nameof(input.OutputFlag), $"Enter the directory path to create the config file: ", q => q
+                .When(ans => string.IsNullOrEmpty(input.OutputFlag) && !ans.DefaultConfiguration)
+                .DefaultsTo(string.Empty));
+
+            prompter.Input(nameof(input.ClientOutputFlag), $"Enter the directory path to create the client proxies: ", q =>
+                q
+                    .When(ans => string.IsNullOrEmpty(input.ClientOutputFlag) && !ans.DefaultConfiguration)
+                    .DefaultsTo(string.Empty));
+
+            prompter.Input(nameof(input.PackageFlag), $"Enter the generator package name: ", q => q
+                .When(ans => string.IsNullOrEmpty(input.PackageFlag) && !ans.DefaultConfiguration)
+                .DefaultsTo(string.Empty));
+
+            prompter.Input(nameof(input.SourceFlag), $"Enter the package source: ", q => q
+                .When(ans => string.IsNullOrEmpty(input.SourceFlag) && !ans.DefaultConfiguration)
+                .DefaultsTo(string.Empty));
+
+            prompter.Input("Properties", $"Enter additional properties: ", q => q
+                .WithInstructions("Allows only key:value pair with comma separated for multiple properties.")
+                .ValidateInputWith((properties, _) => new Regex(@"\s*(.*?)\s*:\s*(.*?)\s*(,|$)").IsMatch(properties))
+                .DefaultsTo(string.Empty)
+                .When(ans => !ans.DefaultConfiguration));
+
+            prompter.BetweenPrompts += (sender, args) => ConsoleWriter.Line();
+            dynamic answers = prompter.Ask();
+
+            if (answers.DefaultConfiguration)
+                return;
+
+            if (GetDynamicMember(answers, "SwaggerFlag"))
+                input.SwaggerFlag = answers.SwaggerFlag;
+            if (GetDynamicMember(answers, "OutputFlag"))
+                input.OutputFlag = answers.OutputFlag;
+            if (GetDynamicMember(answers, "ClientOutputFlag"))
+                input.ClientOutputFlag = answers.ClientOutputFlag;
+            if (GetDynamicMember(answers, "PackageFlag"))
+                input.PackageFlag = answers.PackageFlag;
+            if (GetDynamicMember(answers, "SourceFlag"))
+                input.SourceFlag = answers.SourceFlag;
+
+            if (!GetDynamicMember(answers, "Properties") || answers.Properties == null)
+                return;
+
+            string[] items = answers.Properties.TrimEnd(',').Split(',');
+            foreach (string item in items)
+            {
+                string[] keyValue = item.Split(':');
+                if (input.PropFlag.ContainsKey(keyValue[0]))
+                    input.PropFlag[keyValue[0]] = keyValue[1];
+                else
+                    input.PropFlag.Add(keyValue[0], keyValue[1]);
+            }
         }
 
         private static async Task<List<GeneratorConfiguration>> ProcessInitRequest(ConfigInput input)
@@ -148,14 +228,14 @@ namespace NSwagen.Cli
 
                     foreach (var generatorProperty in generatorInfo.Generator.GeneratorProperties!)
                     {
-                        if (input.PropFlag.All(p => p.Key != generatorProperty.Name))
+                        if (input.PropFlag.All(p => p.Key.Trim() != generatorProperty.Name.Trim()))
                         {
                             configuration.Generator.Properties.Add(generatorProperty.Name,
                                 generatorProperty.DefaultValue);
                         }
                         else
                         {
-                            var propMatch = input.PropFlag.First(p => p.Key == generatorProperty.Name);
+                            var propMatch = input.PropFlag.First(p => p.Key.Trim() == generatorProperty.Name.Trim());
 
                             object propValue = propMatch.Value;
                             if (generatorProperty.DataType!.Contains("bool", StringComparison.OrdinalIgnoreCase))
@@ -171,6 +251,14 @@ namespace NSwagen.Cli
 
             configurations.Add(configuration);
             return configurations;
+        }
+
+        private static bool GetDynamicMember(dynamic answers, string memberName)
+        {
+            var binder = Binder.GetMember(CSharpBinderFlags.None, memberName, answers.GetType(),
+                new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
+
+            return answers.TryGetMember(binder, out object result);
         }
     }
 }

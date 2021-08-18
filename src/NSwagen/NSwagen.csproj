@@ -33,4 +33,8 @@
     <ProjectReference Include="..\NSwagen.Core\NSwagen.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ConsoleFx.Prompter" Version="2.0.0-build.364" />
+  </ItemGroup>
+
 </Project>
