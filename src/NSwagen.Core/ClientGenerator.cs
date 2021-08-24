@@ -32,32 +32,38 @@ namespace NSwagen.Core
             await File.WriteAllTextAsync(_configuration.Output!, clientCode?.ToString()).ConfigureAwait(false);
         }
 
-        public async Task<GeneratorConfiguration> GetGeneratorInfo()
+        public async Task<List<GeneratorConfiguration>> GetGeneratorInfo()
         {
-            GeneratorConfiguration configuration = new ();
+            List<GeneratorConfiguration> configurations = new ();
             var (assembly, packagePath, extractedPackagePath) = await LoadAssembly().ConfigureAwait(false);
 
             //Get the generators
-            var generatorAttribute = assembly.GetCustomAttribute<GeneratorAttribute>();
-            if (generatorAttribute is { })
+            var generatorAttributes = assembly.GetCustomAttributes<GeneratorAttribute>().ToList();
+            if (generatorAttributes is { Count: > 0 })
             {
-                OnStatus.Fire(StatusEvents.Generate,
-                    new { Generator = generatorAttribute.Type },
-                    $"Identifying generator {configuration.Generator.Name} information..");
-
-                configuration.Generator = new Generator()
+                foreach (var attribute in generatorAttributes)
                 {
-                    Name = generatorAttribute.Type.ToString(),
-                    Tags = generatorAttribute.Tags,
-                    GeneratorProperties = Helper.GetGeneratorProperties(assembly),
-                };
+                    GeneratorConfiguration configuration = new ();
+                    OnStatus.Fire(StatusEvents.Generate,
+                        new { Generator = attribute.Type },
+                        $"Identifying generator {attribute.Type.ToString()} information..");
+
+                    configuration.Generator = new Generator()
+                    {
+                        Name = attribute.Type.ToString(),
+                        Tags = attribute.Tags,
+                        GeneratorProperties = Helper.GetGeneratorProperties(assembly),
+                    };
+
+                    configurations.Add(configuration);
+                }
             }
 
             //Delete the package and extracted content
             if (!string.IsNullOrEmpty(packagePath) && !string.IsNullOrEmpty(extractedPackagePath))
                 Helper.PackageCleanup(packagePath, extractedPackagePath);
 
-            return configuration;
+            return configurations;
         }
 
         private async Task<object> GenerateClientCode()
@@ -76,6 +82,9 @@ namespace NSwagen.Core
 
             //Get the client generators from the attributes
             var generatorAttribute = GetGenerator(assembly, _configuration.Generator.Name, _configuration.Generator.Discover);
+
+            if (generatorAttribute is null)
+                throw new Exception($"Matching generator {_configuration.Generator.Name} not found.");
 
             Type? type = assembly.GetType(generatorAttribute.Type.FullName ?? generatorAttribute.Type.Name);
             if (type is null)
@@ -144,27 +153,35 @@ namespace NSwagen.Core
             }
         }
 
-        private static GeneratorAttribute GetGenerator(Assembly assembly, string? name, bool discover)
+        private static GeneratorAttribute? GetGenerator(Assembly assembly, string? name, bool discover)
         {
-            var generatorAttribute = assembly.GetCustomAttribute<GeneratorAttribute>();
+            var generatorAttributes = assembly.GetCustomAttributes<GeneratorAttribute>().ToList();
 
-            if (generatorAttribute is { } && !string.IsNullOrEmpty(name))
+            if (generatorAttributes is { Count: > 0 })
             {
-                return (generatorAttribute.Type.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                foreach (var generatorAttribute in generatorAttributes)
+                {
+                    if (generatorAttribute is { } && !string.IsNullOrEmpty(name) && (generatorAttribute.Type.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
                         generatorAttribute.Type.FullName!.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-                        generatorAttribute.Tags.Contains(name))
-                    ? generatorAttribute
-                    : throw new Exception($"Matching generator {name} not found.");
+                        generatorAttribute.Tags.Contains(name)))
+                        return generatorAttribute;
+
+                    //return (generatorAttribute.Type.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                    //        generatorAttribute.Type.FullName!.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                    //        generatorAttribute.Tags.Contains(name))
+                    //    ? generatorAttribute
+                    //    : throw new Exception($"Matching generator {name} not found.");
+
+                    if (generatorAttribute is null && !discover)
+                        throw new Exception("Generator cannot be found. Please enable the option as discover.");
+                    else
+                    {
+                        //TODO - Discover without any attributes
+                    }
+                }
             }
 
-            if (generatorAttribute is null && !discover)
-                throw new Exception("Generator cannot be found. Please enable the option as discover.");
-            else
-            {
-                //TODO - Discover without any attributes
-            }
-
-            return generatorAttribute!;
+            return default!;
         }
 
         private object CreateGeneratorInstance(Type type, OpenApiDocument swaggerDocument)

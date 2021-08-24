@@ -16,7 +16,7 @@ namespace NSwagen.Annotations
         /// <param name="required">Is required boolean value.</param>
         /// <param name="name">The property name.</param>
         /// <param name="dataType">Data type of generator property.</param>
-        public GeneratorPropertyAttribute(string description, string defaultValue, bool required, string? name = null, string? dataType = null)
+        public GeneratorPropertyAttribute(string description, string defaultValue, bool required, string? name = null, Type? dataType = null)
         {
             Description = description;
             DefaultValue = defaultValue;
@@ -48,6 +48,6 @@ namespace NSwagen.Annotations
         /// <summary>
         /// Gets the data type of the property.
         /// </summary>
-        public string? DataType { get; }
+        public Type? DataType { get; }
     }
 }

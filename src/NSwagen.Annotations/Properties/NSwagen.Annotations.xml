@@ -32,7 +32,7 @@
              Specifies the property which required to be passed for client generation.
             </summary>
         </member>
-        <member name="M:NSwagen.Annotations.GeneratorPropertyAttribute.#ctor(System.String,System.String,System.Boolean,System.String,System.String)">
+        <member name="M:NSwagen.Annotations.GeneratorPropertyAttribute.#ctor(System.String,System.String,System.Boolean,System.String,System.Type)">
             <summary>
             Initializes a new instance of the <see cref="T:NSwagen.Annotations.GeneratorPropertyAttribute"/> class.
             </summary>

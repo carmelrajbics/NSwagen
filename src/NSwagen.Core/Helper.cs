@@ -29,7 +29,7 @@ namespace NSwagen.Core
                                              {
                                                  Name = attr.Name ?? type.Name,
                                                  Required = attr.Required,
-                                                 DataType = attr.DataType ?? type.FullName,
+                                                 DataType = attr.DataType?.FullName ?? type.FullName,
                                                  DefaultValue = attr.DefaultValue,
                                                  Description = attr.Description,
                                              });
@@ -42,7 +42,7 @@ namespace NSwagen.Core
                                              {
                                                  Name = propAttribute.Name ?? propertyInfo.Name,
                                                  Required = propAttribute.Required,
-                                                 DataType = propAttribute.DataType ?? propertyInfo.PropertyType.FullName,
+                                                 DataType = propAttribute.DataType?.FullName ?? propertyInfo.PropertyType.FullName,
                                                  DefaultValue = propAttribute.DefaultValue,
                                                  Description = propAttribute.Description,
                                              });

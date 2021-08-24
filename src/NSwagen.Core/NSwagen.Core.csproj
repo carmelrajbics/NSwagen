@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NSwagen.Annotations" Version="0.1.1" />
+    <PackageReference Include="NSwagen.Annotations" Version="0.1.2" />
     <PackageReference Include="Jeevan.NuGetClient" Version="0.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
     <PackageReference Include="NSwag.Core" Version="13.11.3" />
@@ -26,5 +26,9 @@
     <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="13.10.1" />
     <PackageReference Include="Humanizer.Core" Version="2.11.10" />
   </ItemGroup>
+
+  <!--<ItemGroup>
+    <ProjectReference Include="..\NSwagen.Annotations\NSwagen.Annotations.csproj" />
+  </ItemGroup>-->
 
 </Project>

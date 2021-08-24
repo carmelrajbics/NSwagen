@@ -10,7 +10,7 @@ namespace NSwagen.Cli
 {
     public static class Program
     {
-        public static Task<int> Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             var executor = CommandExecutor.For(_ =>
             {
@@ -21,17 +21,25 @@ namespace NSwagen.Cli
             });
 
 #if DEBUG_TOOL
-            var arguments = args.FirstOrDefault() ?? Console.ReadLine();
-
-            while (!string.IsNullOrEmpty(arguments))
+            var promptArgs = Environment.GetEnvironmentVariable("promptArgs");
+            if (string.Equals(promptArgs, "true", StringComparison.OrdinalIgnoreCase))
             {
-                executor.ExecuteAsync(arguments);
-                arguments = Console.ReadLine();
-            }
+                var arguments = args.FirstOrDefault() ?? Console.ReadLine();
 
-            return Task.FromResult(0);
+                while (!string.IsNullOrEmpty(arguments))
+                {
+                    await executor.ExecuteAsync(arguments).ConfigureAwait(false);
+                    arguments = Console.ReadLine();
+                }
+
+                return 0;
+            }
+            else
+            {
+                return await executor.ExecuteAsync(args).ConfigureAwait(false);
+            }
 #else
-            return Task.FromResult(executor.Execute(args));
+            return await executor.ExecuteAsync(args).ConfigureAwait(false);
 #endif
         }
     }

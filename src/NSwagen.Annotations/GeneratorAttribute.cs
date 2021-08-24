@@ -5,7 +5,7 @@ namespace NSwagen.Annotations
     /// <summary>
     /// Specifies the client generators and tags.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly)]
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class GeneratorAttribute : Attribute
     {
         /// <summary>

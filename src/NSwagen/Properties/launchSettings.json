@@ -6,6 +6,13 @@
         "promptArgs": "true",
         "Key": "Value"
       }
+    },
+    "NSwagen_Config_Init": {
+      "commandName": "Project",
+      "commandLineArgs": "config init",
+      "environmentVariables": {
+        "Key": "Value"
+      }
     }
   }
 }
